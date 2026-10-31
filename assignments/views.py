@@ -31,7 +31,10 @@ def assignment_add(request):
                 container.save()
             return redirect('assignment_list')
     else:
-        form = AssignmentForm(business=business)
+        form = AssignmentForm(
+    business=business,
+    initial={'container': request.GET.get('container')},
+    )
     return render(request, 'assignments/assignment_add.html', {'form': form})
 
 

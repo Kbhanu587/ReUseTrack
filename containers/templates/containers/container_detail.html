@@ -1,0 +1,62 @@
+{% extends 'accounts/base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        {% if not container %}
+            <div class="alert alert-danger">
+                No container with ID <strong>{{ code }}</strong> in your business.
+            </div>
+        {% else %}
+        <div class="card shadow-sm mb-3">
+            <div class="card-body">
+                <h4>{{ container.code }}</h4>
+                <p class="mb-1">Type: {{ container.container_type }}</p>
+                <p class="mb-1">Capacity: {{ container.capacity }}</p>
+                <p class="mb-0">
+                    Status:
+                    {% if container.status == 'AVAILABLE' %}
+                        <span class="badge bg-success">{{ container.get_status_display }}</span>
+                    {% elif container.status == 'WITH_CUSTOMER' %}
+                        <span class="badge bg-primary">{{ container.get_status_display }}</span>
+                    {% elif container.status == 'DAMAGED' %}
+                        <span class="badge bg-warning text-dark">{{ container.get_status_display }}</span>
+                    {% else %}
+                        <span class="badge bg-danger">{{ container.get_status_display }}</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+
+        {% if assignment %}
+        <div class="card shadow-sm mb-3">
+            <div class="card-body">
+                <h6>Currently with</h6>
+                <p class="mb-1"><strong>{{ assignment.customer.name }}</strong> ({{ assignment.customer.phone }})</p>
+                <p class="mb-1">Given: {{ assignment.assigned_date|date:"d M Y" }}</p>
+                <p class="mb-1">
+                    Due: {{ assignment.expected_return_date|date:"d M Y" }}
+                    {% if assignment.is_overdue %}<span class="badge bg-danger">Overdue</span>{% endif %}
+                </p>
+                <p class="mb-3">Deposit: ₹{{ assignment.deposit_amount }}</p>
+
+                <form method="post" action="{% url 'assignment_return' assignment.pk %}" class="d-flex gap-2">
+                    {% csrf_token %}
+                    <select name="condition" class="form-select">
+                        <option value="GOOD">Good</option>
+                        <option value="DAMAGED">Damaged</option>
+                    </select>
+                    <button class="btn btn-success">Return</button>
+                </form>
+            </div>
+        </div>
+        {% elif container.status == 'AVAILABLE' %}
+        <a href="{% url 'assignment_add' %}?container={{ container.pk }}" class="btn btn-success w-100 mb-3">
+            Assign to a customer
+        </a>
+        {% endif %}
+        {% endif %}
+
+        <a href="{% url 'container_scan' %}" class="btn btn-outline-success w-100">Scan another</a>
+    </div>
+</div>
+{% endblock %}

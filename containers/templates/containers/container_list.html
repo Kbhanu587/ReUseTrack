@@ -2,7 +2,11 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h4 class="mb-0">Containers</h4>
-    <a href="{% url 'container_add' %}" class="btn btn-success">+ Add container</a>
+    <div class="d-flex gap-2">
+        <a href="{% url 'container_scan' %}" class="btn btn-outline-success">Scan</a>
+        <a href="{% url 'container_labels' %}" class="btn btn-outline-success">QR labels</a>
+        <a href="{% url 'container_add' %}" class="btn btn-success">+ Add container</a>
+    </div>
 </div>
 
 <div class="card shadow-sm">

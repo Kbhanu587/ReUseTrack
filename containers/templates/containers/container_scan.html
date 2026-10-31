@@ -1,0 +1,47 @@
+{% extends 'accounts/base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm mb-3">
+            <div class="card-body">
+                <h4 class="mb-3">Scan container</h4>
+                <div id="reader" style="width:100%"></div>
+                <button id="startBtn" class="btn btn-success w-100 mt-2">Start camera</button>
+                <p id="camError" class="text-danger small mt-2"></p>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h6>No camera? Type the container ID</h6>
+                <form method="get" action="{% url 'container_find' %}" class="d-flex gap-2">
+                    <input type="text" name="code" class="form-control" placeholder="WTR-001" required>
+                    <button class="btn btn-outline-success">Find</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script>
+    const findUrl = "{% url 'container_find' %}";
+    const scanner = new Html5Qrcode("reader");
+
+    document.getElementById("startBtn").addEventListener("click", function () {
+        scanner.start(
+            { facingMode: "environment" },
+            { fps: 10, qrbox: 220 },
+            function (decodedText) {
+                scanner.stop().then(function () {
+                    window.location.href = findUrl + "?code=" + encodeURIComponent(decodedText);
+                });
+            },
+            function () { /* called on every frame with no QR; ignore */ }
+        ).catch(function (err) {
+            document.getElementById("camError").textContent =
+                "Camera could not start: " + err;
+        });
+    });
+</script>
+{% endblock %}

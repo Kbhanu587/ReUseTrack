@@ -1,0 +1,30 @@
+{% extends 'accounts/base.html' %}
+{% block content %}
+<style>
+    @media print {
+        .navbar, .no-print { display: none !important; }
+        body { background: white !important; }
+    }
+    .label-box { border: 2px dashed #999; padding: 10px; text-align: center; }
+    .label-box img { width: 100%; max-width: 160px; }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-3 no-print">
+    <h4 class="mb-0">QR labels</h4>
+    <button onclick="window.print()" class="btn btn-success">Print</button>
+</div>
+
+<div class="row g-3">
+    {% for c in containers %}
+    <div class="col-6 col-md-3">
+        <div class="label-box bg-white">
+            <img src="{% url 'container_qr' c.pk %}" alt="QR for {{ c.code }}">
+            <div><strong>{{ c.code }}</strong></div>
+            <small>{{ c.container_type }} · {{ c.capacity }}</small>
+        </div>
+    </div>
+    {% empty %}
+    <p class="text-muted">No containers yet.</p>
+    {% endfor %}
+</div>
+{% endblock %}
