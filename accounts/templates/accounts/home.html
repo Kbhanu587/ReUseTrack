@@ -1,0 +1,9 @@
+{% extends 'accounts/base.html' %}
+{% block content %}
+<div class="text-center py-5">
+    <h1>Smart Returnable Packaging Management</h1>
+    <p class="lead">Track every reusable container, customer and deposit.</p>
+    <a href="{% url 'register' %}" class="btn btn-success btn-lg">Register your business</a>
+    <a href="{% url 'login' %}" class="btn btn-outline-success btn-lg">Login</a>
+</div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'accounts/base.html' %}
+{% block content %}
+<h4 class="mb-1">{{ user.business.name }}</h4>
+<p class="text-muted">Welcome, {{ user.first_name|default:user.username }} ({{ user.get_role_display }})</p>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="card text-center shadow-sm"><div class="card-body">
+            <h2>{{ stats.total }}</h2><small>Total containers</small>
+        </div></div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card text-center shadow-sm"><div class="card-body">
+            <h2>{{ stats.available }}</h2><small>Available</small>
+        </div></div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card text-center shadow-sm"><div class="card-body">
+            <h2>{{ stats.with_customer }}</h2><small>With customers</small>
+        </div></div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card text-center shadow-sm border-danger"><div class="card-body">
+            <h2 class="text-danger">0</h2><small>Overdue</small>
+        </div></div>
+    </div>
+</div>
+{% endblock %}

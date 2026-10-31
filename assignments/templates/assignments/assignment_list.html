@@ -1,0 +1,54 @@
+{% extends 'accounts/base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="mb-0">Assignments</h4>
+    <a href="{% url 'assignment_add' %}" class="btn btn-success">+ Assign container</a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Container</th><th>Customer</th><th>Given</th>
+                    <th>Due</th><th>Deposit</th><th>Status</th><th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in assignments %}
+                <tr>
+                    <td><strong>{{ a.container.code }}</strong></td>
+                    <td>{{ a.customer.name }}</td>
+                    <td>{{ a.assigned_date|date:"d M Y" }}</td>
+                    <td>{{ a.expected_return_date|date:"d M Y" }}</td>
+                    <td>₹{{ a.deposit_amount }}</td>
+                    <td>
+                        {% if a.returned_date %}
+                            <span class="badge bg-secondary">Returned {{ a.returned_date|date:"d M" }}</span>
+                        {% elif a.is_overdue %}
+                            <span class="badge bg-danger">Overdue</span>
+                        {% else %}
+                            <span class="badge bg-primary">With customer</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if not a.returned_date %}
+                        <form method="post" action="{% url 'assignment_return' a.pk %}" class="d-flex gap-1 mb-0">
+                            {% csrf_token %}
+                            <select name="condition" class="form-select form-select-sm">
+                                <option value="GOOD">Good</option>
+                                <option value="DAMAGED">Damaged</option>
+                            </select>
+                            <button class="btn btn-sm btn-success">Return</button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7" class="text-center text-muted py-4">No assignments yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

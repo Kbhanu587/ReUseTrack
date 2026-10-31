@@ -1,0 +1,39 @@
+{% extends 'accounts/base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="mb-0">Containers</h4>
+    <a href="{% url 'container_add' %}" class="btn btn-success">+ Add container</a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table mb-0">
+            <thead>
+                <tr><th>ID</th><th>Type</th><th>Capacity</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+                {% for c in containers %}
+                <tr>
+                    <td><strong>{{ c.code }}</strong></td>
+                    <td>{{ c.container_type }}</td>
+                    <td>{{ c.capacity }}</td>
+                    <td>
+                        {% if c.status == 'AVAILABLE' %}
+                            <span class="badge bg-success">{{ c.get_status_display }}</span>
+                        {% elif c.status == 'WITH_CUSTOMER' %}
+                            <span class="badge bg-primary">{{ c.get_status_display }}</span>
+                        {% elif c.status == 'DAMAGED' %}
+                            <span class="badge bg-warning text-dark">{{ c.get_status_display }}</span>
+                        {% else %}
+                            <span class="badge bg-danger">{{ c.get_status_display }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="text-center text-muted py-4">No containers yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
