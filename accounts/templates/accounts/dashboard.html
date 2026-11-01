@@ -6,6 +6,7 @@
 <a href="{% url 'customer_list' %}" class="btn btn-outline-success mb-3">Customers</a>
 <a href="{% url 'container_list' %}" class="btn btn-outline-success mb-3">Containers</a>
 <a href="{% url 'assignment_list' %}" class="btn btn-outline-success mb-3">Assignments</a>
+<a href="{% url 'issue_list' %}" class="btn btn-outline-danger mb-3">Issues</a>
 <a href="{% url 'container_scan' %}" class="btn btn-success mb-3">Scan QR</a>
 {% if user.role == 'ADMIN' %}
 <a href="{% url 'staff_list' %}" class="btn btn-outline-success mb-3">Staff</a>
@@ -30,6 +31,16 @@
     <div class="col-6 col-md-3">
         <div class="card text-center shadow-sm border-danger"><div class="card-body">
             <h2 class="text-danger">{{ stats.overdue }}</h2><small>Overdue</small>
+        </div></div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card text-center shadow-sm"><div class="card-body">
+            <h2 class="text-danger">{{ stats.lost }}</h2><small>Lost</small>
+        </div></div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card text-center shadow-sm"><div class="card-body">
+            <h2 class="text-warning">{{ stats.damaged }}</h2><small>Damaged</small>
         </div></div>
     </div>
 </div>

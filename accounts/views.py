@@ -41,6 +41,8 @@ def dashboard(request):
         'available': containers.filter(status=Container.Status.AVAILABLE).count(),
         'with_customer': containers.filter(status=Container.Status.WITH_CUSTOMER).count(),
         'overdue': overdue,
+        'lost': containers.filter(status=Container.Status.LOST).count(),
+        'damaged': containers.filter(status=Container.Status.DAMAGED).count(),
     }
 
     if request.user.role == User.Role.ADMIN:

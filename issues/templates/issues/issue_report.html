@@ -1,0 +1,20 @@
+{% extends 'accounts/base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h4 class="mb-1">Report an issue</h4>
+                <p class="text-muted">Container <strong>{{ container.code }}</strong> ({{ container.get_status_display }})</p>
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.non_field_errors }}
+                    {{ form.as_p }}
+                    <button class="btn btn-danger w-100">Report issue</button>
+                    <a href="{% url 'container_list' %}" class="btn btn-link w-100 mt-2">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends 'accounts/base.html' %}
+{% block content %}
+<h4 class="mb-3">Lost and damaged containers</h4>
+
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Container</th><th>Issue</th><th>Details</th>
+                    <th>Reported</th><th>Status</th><th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for i in issues %}
+                <tr>
+                    <td><strong>{{ i.container.code }}</strong></td>
+                    <td>
+                        {% if i.kind == 'LOST' %}
+                            <span class="badge bg-danger">Lost</span>
+                        {% else %}
+                            <span class="badge bg-warning text-dark">Damaged</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ i.description }}
+                        {% if i.assignment %}<br><small class="text-muted">Customer: {{ i.assignment.customer.name }}</small>{% endif %}
+                    </td>
+                    <td>
+                        {{ i.created_at|date:"d M Y" }}
+                        <br><small class="text-muted">{{ i.reported_by.first_name|default:i.reported_by.username }}</small>
+                    </td>
+                    <td>
+                        {% if i.is_open %}
+                            <span class="badge bg-primary">Open</span>
+                        {% else %}
+                            <span class="badge bg-secondary">{{ i.get_resolution_display }} {{ i.resolved_at|date:"d M" }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if i.is_open and user.role == 'ADMIN' %}
+                        <form method="post" action="{% url 'issue_resolve' i.pk %}" class="d-flex gap-1 mb-0">
+                            {% csrf_token %}
+                            <select name="action" class="form-select form-select-sm">
+                                {% if i.kind == 'DAMAGED' %}
+                                    <option value="REPAIRED">Repaired (back to stock)</option>
+                                {% else %}
+                                    <option value="FOUND">Found (back to stock)</option>
+                                {% endif %}
+                                <option value="WRITTEN_OFF">Write off</option>
+                            </select>
+                            <button class="btn btn-sm btn-success">Resolve</button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="text-center text-muted py-4">No issues reported.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

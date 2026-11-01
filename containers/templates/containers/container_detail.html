@@ -54,9 +54,13 @@
             Assign to a customer
         </a>
         {% endif %}
+
+        {% if container.status != 'LOST' %}
+        <a href="{% url 'issue_report' container.pk %}" class="btn btn-outline-danger w-100 mb-3">Report lost / damaged</a>
+        {% endif %}
         {% endif %}
 
         <a href="{% url 'container_scan' %}" class="btn btn-outline-success w-100">Scan another</a>
     </div>
 </div>
-{% endblock %}
+{% endblock %}`

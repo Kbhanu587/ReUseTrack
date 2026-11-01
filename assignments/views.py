@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 from containers.models import Container
+from issues.models import Issue
 from payments.models import Transaction
 from .forms import AssignmentForm
 from .models import Assignment
@@ -65,6 +66,14 @@ def assignment_return(request, pk):
         container = assignment.container
         if condition == Assignment.Condition.DAMAGED:
             container.status = Container.Status.DAMAGED
+            Issue.objects.create(
+                business=request.user.business,
+                container=container,
+                assignment=assignment,
+                kind=Issue.Kind.DAMAGED,
+                description=f'Returned damaged by {assignment.customer.name}.',
+                reported_by=request.user,
+            )
         else:
             container.status = Container.Status.AVAILABLE
         container.save()
