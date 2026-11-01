@@ -31,3 +31,9 @@ class AssignmentForm(forms.ModelForm):
         if date < timezone.localdate():
             raise forms.ValidationError('The return date cannot be in the past.')
         return date
+
+    def clean_deposit_amount(self):
+        amount = self.cleaned_data['deposit_amount']
+        if amount < 0:
+            raise forms.ValidationError('The deposit cannot be negative.')
+        return amount

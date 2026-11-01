@@ -14,9 +14,9 @@
             <tbody>
                 {% for c in customers %}
                 <tr>
-                    <td>{{ c.name }}</td>
-                    <td>{{ c.phone }}</td>
-                    <td>{{ c.address }}</td>
+                    <td><a href="{% url 'customer_detail' c.pk %}">{{ c.name }}</a></td>
+                    <td><a href="{% url 'customer_detail' c.pk %}">{{ c.phone }}</a></td>
+                    <td><a href="{% url 'customer_detail' c.pk %}">{{ c.address }}</a></td>
                 </tr>
                 {% empty %}
                 <tr><td colspan="3" class="text-center text-muted py-4">No customers yet.</td></tr>

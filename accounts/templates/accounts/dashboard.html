@@ -2,10 +2,14 @@
 {% block content %}
 <h4 class="mb-1">{{ user.business.name }}</h4>
 <p class="text-muted">Welcome, {{ user.first_name|default:user.username }} ({{ user.get_role_display }})</p>
+
 <a href="{% url 'customer_list' %}" class="btn btn-outline-success mb-3">Customers</a>
 <a href="{% url 'container_list' %}" class="btn btn-outline-success mb-3">Containers</a>
 <a href="{% url 'assignment_list' %}" class="btn btn-outline-success mb-3">Assignments</a>
 <a href="{% url 'container_scan' %}" class="btn btn-success mb-3">Scan QR</a>
+{% if user.role == 'ADMIN' %}
+<a href="{% url 'staff_list' %}" class="btn btn-outline-success mb-3">Staff</a>
+{% endif %}
 
 <div class="row g-3 mb-4">
     <div class="col-6 col-md-3">
@@ -25,8 +29,23 @@
     </div>
     <div class="col-6 col-md-3">
         <div class="card text-center shadow-sm border-danger"><div class="card-body">
-            <h2 class="text-danger">0</h2><small>Overdue</small>
+            <h2 class="text-danger">{{ stats.overdue }}</h2><small>Overdue</small>
         </div></div>
     </div>
 </div>
+
+{% if user.role == 'ADMIN' %}
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="card text-center shadow-sm"><div class="card-body">
+            <h2>₹{{ stats.deposits }}</h2><small>Deposits collected</small>
+        </div></div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card text-center shadow-sm"><div class="card-body">
+            <h2>₹{{ stats.refunds }}</h2><small>Refunds issued</small>
+        </div></div>
+    </div>
+</div>
+{% endif %}
 {% endblock %}

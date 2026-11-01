@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 from containers.models import Container
+from payments.models import Transaction
 from .forms import AssignmentForm
 from .models import Assignment
 
@@ -29,12 +30,21 @@ def assignment_add(request):
                 container = assignment.container
                 container.status = Container.Status.WITH_CUSTOMER
                 container.save()
+                if assignment.deposit_amount > 0:
+                    Transaction.objects.create(
+                        business=business,
+                        customer=assignment.customer,
+                        assignment=assignment,
+                        kind=Transaction.Kind.DEPOSIT,
+                        amount=assignment.deposit_amount,
+                        note=f'Deposit for {container.code}',
+                    )
             return redirect('assignment_list')
     else:
         form = AssignmentForm(
-    business=business,
-    initial={'container': request.GET.get('container')},
-    )
+            business=business,
+            initial={'container': request.GET.get('container')},
+        )
     return render(request, 'assignments/assignment_add.html', {'form': form})
 
 

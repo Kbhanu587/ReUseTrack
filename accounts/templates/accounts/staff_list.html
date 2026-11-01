@@ -1,0 +1,42 @@
+{% extends 'accounts/base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="mb-0">Staff</h4>
+    <a href="{% url 'staff_add' %}" class="btn btn-success">+ Add staff</a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table align-middle mb-0">
+            <thead>
+                <tr><th>Name</th><th>Mobile (login)</th><th>Status</th><th></th></tr>
+            </thead>
+            <tbody>
+                {% for s in staff %}
+                <tr>
+                    <td>{{ s.first_name|default:s.username }}</td>
+                    <td>{{ s.phone }}</td>
+                    <td>
+                        {% if s.is_active %}
+                            <span class="badge bg-success">Active</span>
+                        {% else %}
+                            <span class="badge bg-secondary">Deactivated</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <form method="post" action="{% url 'staff_toggle' s.pk %}" class="mb-0">
+                            {% csrf_token %}
+                            <button class="btn btn-sm btn-outline-secondary">
+                                {% if s.is_active %}Deactivate{% else %}Activate{% endif %}
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="text-center text-muted py-4">No staff yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
