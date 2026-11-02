@@ -14,3 +14,14 @@ def admin_required(view_func):
             raise PermissionDenied
         return view_func(request, *args, **kwargs)
     return wrapper
+
+
+def staff_required(view_func):
+    @wraps(view_func)
+    @login_required
+    def wrapper(request, *args, **kwargs):
+        allowed = (User.Role.ADMIN, User.Role.STAFF)
+        if request.user.role not in allowed or request.user.business_id is None:
+            raise PermissionDenied
+        return view_func(request, *args, **kwargs)
+    return wrapper

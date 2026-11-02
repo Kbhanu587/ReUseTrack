@@ -2,9 +2,15 @@
 {% block content %}
 <a href="{% url 'customer_list' %}" class="btn btn-link px-0">← Customers</a>
 <h4 class="mb-0">{{ customer.name }}</h4>
-<p class="text-muted">
+<p class="text-muted mb-2">
     {{ customer.phone }}{% if customer.address %} · {{ customer.address }}{% endif %}
 </p>
+
+{% if customer.user_id %}
+<p><span class="badge bg-success">Portal login active</span></p>
+{% else %}
+<a href="{% url 'customer_portal_login' customer.pk %}" class="btn btn-outline-success btn-sm mb-3">Create portal login</a>
+{% endif %}
 
 {% if user.role == 'ADMIN' %}
 <div class="card text-center shadow-sm mb-4" style="max-width:260px">

@@ -7,6 +7,7 @@
 <a href="{% url 'container_list' %}" class="btn btn-outline-success mb-3">Containers</a>
 <a href="{% url 'assignment_list' %}" class="btn btn-outline-success mb-3">Assignments</a>
 <a href="{% url 'issue_list' %}" class="btn btn-outline-danger mb-3">Issues</a>
+<a href="{% url 'pickup_list' %}" class="btn btn-outline-success mb-3">Pickups</a>
 <a href="{% url 'container_scan' %}" class="btn btn-success mb-3">Scan QR</a>
 {% if user.role == 'ADMIN' %}
 <a href="{% url 'staff_list' %}" class="btn btn-outline-success mb-3">Staff</a>

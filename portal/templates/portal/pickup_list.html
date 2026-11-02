@@ -1,0 +1,41 @@
+{% extends 'accounts/base.html' %}
+{% block content %}
+<h4 class="mb-3">Pickup requests</h4>
+
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table align-middle mb-0">
+            <thead>
+                <tr><th>Customer</th><th>Container</th><th>Note</th><th>Requested</th><th>Status</th><th></th></tr>
+            </thead>
+            <tbody>
+                {% for p in pickups %}
+                <tr>
+                    <td>{{ p.customer.name }}<br><small class="text-muted">{{ p.customer.phone }}</small></td>
+                    <td><strong>{{ p.assignment.container.code }}</strong></td>
+                    <td>{{ p.note }}</td>
+                    <td>{{ p.created_at|date:"d M Y, H:i" }}</td>
+                    <td>
+                        {% if p.status == 'OPEN' %}
+                            <span class="badge bg-primary">Open</span>
+                        {% else %}
+                            <span class="badge bg-secondary">Done {{ p.completed_at|date:"d M" }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if p.status == 'OPEN' %}
+                        <form method="post" action="{% url 'pickup_done' p.pk %}" class="mb-0">
+                            {% csrf_token %}
+                            <button class="btn btn-sm btn-success">Mark done</button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="text-center text-muted py-4">No pickup requests.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
