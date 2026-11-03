@@ -11,11 +11,18 @@
         <div class="container">
             <a class="navbar-brand" href="{% url 'home' %}">♻ ReUseTrack</a>
             {% if user.is_authenticated %}
-                <form method="post" action="{% url 'logout' %}" class="d-flex align-items-center gap-2 mb-0">
-                    {% csrf_token %}
-                    <span class="text-white">{{ user.first_name|default:user.username }}</span>
-                    <button class="btn btn-outline-light btn-sm">Logout</button>
-                </form>
+                <div class="d-flex align-items-center gap-3">
+                    {% if user.business_id %}
+                    <a href="{% url 'notification_list' %}" class="text-white text-decoration-none">
+                        🔔{% if unread_count %}<span class="badge bg-danger ms-1">{{ unread_count }}</span>{% endif %}
+                    </a>
+                    {% endif %}
+                    <form method="post" action="{% url 'logout' %}" class="d-flex align-items-center gap-2 mb-0">
+                        {% csrf_token %}
+                        <span class="text-white">{{ user.first_name|default:user.username }}</span>
+                        <button class="btn btn-outline-light btn-sm">Logout</button>
+                    </form>
+                </div>
             {% endif %}
         </div>
     </nav>
@@ -27,5 +34,36 @@
         {% endfor %}
         {% block content %}{% endblock %}
     </div>
+
+    {% if user.is_authenticated %}
+    <script>
+    (function () {
+        var REFRESH_MS = 10000;
+        var IDLE_MS = 60000;
+        var skipPaths = ['/add/', '/report/', '/portal-login/', '/admin/'];
+        var lastTouch = 0;
+
+        function touch() { lastTouch = Date.now(); }
+        document.addEventListener('input', touch, true);
+        document.addEventListener('change', touch, true);
+        document.addEventListener('focusin', function (e) {
+            if (e.target.matches('input, select, textarea')) touch();
+        }, true);
+
+        function blocked() {
+            if (document.hidden) return true;
+            if (document.getElementById('reader')) return true;
+            for (var i = 0; i < skipPaths.length; i++) {
+                if (location.pathname.indexOf(skipPaths[i]) !== -1) return true;
+            }
+            return Date.now() - lastTouch < IDLE_MS;
+        }
+
+        setInterval(function () {
+            if (!blocked()) location.reload();
+        }, REFRESH_MS);
+    })();
+    </script>
+    {% endif %}
 </body>
 </html>

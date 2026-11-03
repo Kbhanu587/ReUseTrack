@@ -24,9 +24,20 @@
                     </td>
                     <td>
                         {% if p.status == 'OPEN' %}
-                        <form method="post" action="{% url 'pickup_done' p.pk %}" class="mb-0">
+                        <form method="post" action="{% url 'pickup_done' p.pk %}" class="d-flex align-items-center gap-2 mb-0">
                             {% csrf_token %}
-                            <button class="btn btn-sm btn-success">Mark done</button>
+                            <select name="condition" class="form-select form-select-sm">
+                                <option value="GOOD">Good</option>
+                                <option value="DAMAGED">Damaged</option>
+                            </select>
+                            {% if user.role == 'ADMIN' and p.assignment.deposit_amount > 0 %}
+                            <div class="form-check mb-0 text-nowrap">
+                                <input class="form-check-input" type="checkbox" name="refund_deposit"
+                                       value="1" id="rf{{ p.pk }}" checked>
+                                <label class="form-check-label small" for="rf{{ p.pk }}">Refund deposit</label>
+                            </div>
+                            {% endif %}
+                            <button class="btn btn-sm btn-success text-nowrap">Collect &amp; done</button>
                         </form>
                         {% endif %}
                     </td>

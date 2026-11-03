@@ -45,6 +45,12 @@
                         <option value="GOOD">Good</option>
                         <option value="DAMAGED">Damaged</option>
                     </select>
+                    {% if user.role == 'ADMIN' and assignment.deposit_amount > 0 %}
+                    <div class="form-check mb-0 text-nowrap align-self-center">
+                    <input class="form-check-input" type="checkbox" name="refund_deposit" value="1" id="rf" checked>
+                    <label class="form-check-label small" for="rf">Refund deposit</label>
+                    </div>
+                    {% endif %}
                     <button class="btn btn-success">Return</button>
                 </form>
             </div>

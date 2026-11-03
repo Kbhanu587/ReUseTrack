@@ -1,0 +1,20 @@
+{% extends 'accounts/base.html' %}
+{% block content %}
+<h4 class="mb-3">Notifications</h4>
+
+<div class="list-group shadow-sm">
+    {% for n in items %}
+    <div class="list-group-item {% if not n.is_read %}list-group-item-success{% endif %}">
+        <div class="d-flex justify-content-between">
+            <div>
+                {% if not n.is_read %}<span class="badge bg-success me-1">New</span>{% endif %}
+                {% if n.link %}<a href="{{ n.link }}">{{ n.message }}</a>{% else %}{{ n.message }}{% endif %}
+            </div>
+            <small class="text-muted text-nowrap ms-3">{{ n.created_at|date:"d M, H:i" }}</small>
+        </div>
+    </div>
+    {% empty %}
+    <div class="list-group-item text-center text-muted py-4">No notifications yet.</div>
+    {% endfor %}
+</div>
+{% endblock %}

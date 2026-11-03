@@ -1,11 +1,16 @@
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_POST
+from accounts.models import User
 from containers.models import Container
 from issues.models import Issue
+from notifications.services import notify
 from payments.models import Transaction
+from payments.services import refundable_balance
 from .forms import AssignmentForm
 from .models import Assignment
 
@@ -40,6 +45,12 @@ def assignment_add(request):
                         amount=assignment.deposit_amount,
                         note=f'Deposit for {container.code}',
                     )
+                notify(
+                    assignment.customer.user,
+                    f'{container.code} was given to you. Please return it by '
+                    f'{assignment.expected_return_date.strftime("%d %b %Y")}.',
+                    reverse('portal_home'),
+                )
             return redirect('assignment_list')
     else:
         form = AssignmentForm(
@@ -52,14 +63,15 @@ def assignment_add(request):
 @login_required
 @require_POST
 def assignment_return(request, pk):
-    assignment = get_object_or_404(
-        Assignment, pk=pk, business=request.user.business, returned_date__isnull=True
-    )
     condition = request.POST.get('condition', Assignment.Condition.GOOD)
     if condition not in Assignment.Condition.values:
         condition = Assignment.Condition.GOOD
 
     with transaction.atomic():
+        assignment = get_object_or_404(
+            Assignment.objects.select_for_update(),
+            pk=pk, business=request.user.business, returned_date__isnull=True,
+        )
         assignment.returned_date = timezone.localdate()
         assignment.return_condition = condition
         assignment.save()
@@ -77,4 +89,28 @@ def assignment_return(request, pk):
         else:
             container.status = Container.Status.AVAILABLE
         container.save()
+
+        wants_refund = request.POST.get('refund_deposit') == '1'
+        if (wants_refund and request.user.role == User.Role.ADMIN
+                and condition == Assignment.Condition.GOOD):
+            balance = refundable_balance(assignment)
+            if balance > 0:
+                Transaction.objects.create(
+                    business=request.user.business,
+                    customer=assignment.customer,
+                    assignment=assignment,
+                    kind=Transaction.Kind.REFUND,
+                    amount=balance,
+                    note=f'Refund for {container.code}',
+                )
+                notify(
+                    assignment.customer.user,
+                    f'A refund of ₹{balance} was issued for {container.code}.',
+                    reverse('portal_deposits'),
+                )
+                messages.success(request, f'{container.code} returned and ₹{balance} refunded.')
+            else:
+                messages.success(request, f'{container.code} returned.')
+        else:
+            messages.success(request, f'{container.code} returned.')
     return redirect('assignment_list')

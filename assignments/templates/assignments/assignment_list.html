@@ -33,12 +33,19 @@
                     </td>
                     <td>
                         {% if not a.returned_date %}
-                        <form method="post" action="{% url 'assignment_return' a.pk %}" class="d-flex gap-1 mb-0">
+                        <form method="post" action="{% url 'assignment_return' a.pk %}" class="d-flex align-items-center gap-2 mb-0">
                             {% csrf_token %}
                             <select name="condition" class="form-select form-select-sm">
                                 <option value="GOOD">Good</option>
                                 <option value="DAMAGED">Damaged</option>
                             </select>
+                            {% if user.role == 'ADMIN' and a.deposit_amount > 0 %}
+                            <div class="form-check mb-0 text-nowrap">
+                                <input class="form-check-input" type="checkbox" name="refund_deposit"
+                                       value="1" id="rf{{ a.pk }}" checked>
+                                <label class="form-check-label small" for="rf{{ a.pk }}">Refund deposit</label>
+                            </div>
+                            {% endif %}
                             <button class="btn btn-sm btn-success">Return</button>
                         </form>
                         {% endif %}

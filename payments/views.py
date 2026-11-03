@@ -5,10 +5,12 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse
 from django.views.decorators.http import require_POST
 
 from accounts.models import User
 from assignments.models import Assignment
+from notifications.services import notify
 from .models import Transaction
 from .services import refundable_balance
 
@@ -56,6 +58,11 @@ def refund(request, assignment_pk):
             kind=Transaction.Kind.REFUND,
             amount=amount,
             note=f'Refund for {assignment.container.code}',
+        )
+        notify(
+            assignment.customer.user,
+            f'A refund of ₹{amount} was issued for {assignment.container.code}.',
+            reverse('portal_deposits'),
         )
         messages.success(request, f'Refund of ₹{amount} recorded.')
     return back
