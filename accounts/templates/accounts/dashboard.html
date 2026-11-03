@@ -44,10 +44,7 @@
             <h2 class="text-warning">{{ stats.damaged }}</h2><small>Damaged</small>
         </div></div>
     </div>
-</div>
-
-{% if user.role == 'ADMIN' %}
-<div class="row g-3 mb-4">
+    {% if user.role == 'ADMIN' %}
     <div class="col-6 col-md-3">
         <div class="card text-center shadow-sm"><div class="card-body">
             <h2>₹{{ stats.deposits }}</h2><small>Deposits collected</small>
@@ -58,6 +55,81 @@
             <h2>₹{{ stats.refunds }}</h2><small>Refunds issued</small>
         </div></div>
     </div>
+    {% endif %}
 </div>
-{% endif %}
+
+<div class="row g-3 mb-4">
+    <div class="col-md-5">
+        <div class="card shadow-sm"><div class="card-body">
+            <h6>Containers by status</h6>
+            <div style="position:relative; height:260px;"><canvas id="statusChart"></canvas></div>
+        </div></div>
+    </div>
+    <div class="col-md-7">
+        <div class="card shadow-sm"><div class="card-body">
+            <h6>Given and returned (last 7 days)</h6>
+            <div style="position:relative; height:260px;"><canvas id="activityChart"></canvas></div>
+        </div></div>
+    </div>
+    {% if user.role == 'ADMIN' %}
+    <div class="col-md-5">
+        <div class="card shadow-sm"><div class="card-body">
+            <h6>Deposits and refunds (₹)</h6>
+            <div style="position:relative; height:260px;"><canvas id="moneyChart"></canvas></div>
+        </div></div>
+    </div>
+    {% endif %}
+</div>
+
+{{ chart_data|json_script:"chart-data" }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+    const data = JSON.parse(document.getElementById('chart-data').textContent);
+    Chart.defaults.animation = false;
+
+    new Chart(document.getElementById('statusChart'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Available', 'With customers', 'Damaged', 'Lost'],
+            datasets: [{
+                data: data.status,
+                backgroundColor: ['#198754', '#0d6efd', '#ffc107', '#dc3545']
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+
+    new Chart(document.getElementById('activityChart'), {
+        type: 'line',
+        data: {
+            labels: data.labels,
+            datasets: [
+                { label: 'Given', data: data.given, borderColor: '#0d6efd', backgroundColor: '#0d6efd', tension: 0.3 },
+                { label: 'Returned', data: data.returned, borderColor: '#198754', backgroundColor: '#198754', tension: 0.3 }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+        }
+    });
+
+    const moneyCanvas = document.getElementById('moneyChart');
+    if (moneyCanvas && data.money) {
+        new Chart(moneyCanvas, {
+            type: 'bar',
+            data: {
+                labels: ['Deposits collected', 'Refunds issued'],
+                datasets: [{ data: data.money, backgroundColor: ['#198754', '#dc3545'] }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+    }
+</script>
 {% endblock %}

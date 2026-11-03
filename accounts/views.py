@@ -1,7 +1,9 @@
+from datetime import timedelta
+
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum
+from django.db.models import Count, Sum
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
@@ -26,14 +28,21 @@ def register(request):
     return render(request, 'accounts/register.html', {'form': form})
 
 
+def _per_day(queryset, field, days):
+    rows = queryset.values(field).annotate(n=Count('id'))
+    counts = {row[field]: row['n'] for row in rows}
+    return [counts.get(day, 0) for day in days]
+
+
 @login_required
 def dashboard(request):
     business = request.user.business
+    today = timezone.localdate()
     containers = Container.objects.filter(business=business)
     overdue = Assignment.objects.filter(
         business=business,
         returned_date__isnull=True,
-        expected_return_date__lt=timezone.localdate(),
+        expected_return_date__lt=today,
     ).count()
 
     stats = {
@@ -45,6 +54,17 @@ def dashboard(request):
         'damaged': containers.filter(status=Container.Status.DAMAGED).count(),
     }
 
+    days = [today - timedelta(days=i) for i in range(6, -1, -1)]
+    assignments = Assignment.objects.filter(business=business)
+    chart_data = {
+        'labels': [d.strftime('%d %b') for d in days],
+        'status': [
+            stats['available'], stats['with_customer'], stats['damaged'], stats['lost'],
+        ],
+        'given': _per_day(assignments.filter(assigned_date__gte=days[0]), 'assigned_date', days),
+        'returned': _per_day(assignments.filter(returned_date__gte=days[0]), 'returned_date', days),
+    }
+
     if request.user.role == User.Role.ADMIN:
         def money_total(kind):
             result = Transaction.objects.filter(business=business, kind=kind).aggregate(total=Sum('amount'))
@@ -52,8 +72,9 @@ def dashboard(request):
 
         stats['deposits'] = money_total(Transaction.Kind.DEPOSIT)
         stats['refunds'] = money_total(Transaction.Kind.REFUND)
+        chart_data['money'] = [float(stats['deposits']), float(stats['refunds'])]
 
-    return render(request, 'accounts/dashboard.html', {'stats': stats})
+    return render(request, 'accounts/dashboard.html', {'stats': stats, 'chart_data': chart_data})
 
 
 def home(request):
