@@ -1,9 +1,24 @@
 {% extends 'accounts/base.html' %}
 {% block content %}
-<div class="text-center py-5">
-    <h1>Smart Returnable Packaging Management</h1>
-    <p class="lead">Track every reusable container, customer and deposit.</p>
-    <a href="{% url 'register' %}" class="btn btn-success btn-lg">Register your business</a>
-    <a href="{% url 'login' %}" class="btn btn-outline-success btn-lg">Login</a>
+<div class="hero text-center">
+    <h1 class="fw-bold">Never lose a returnable container again</h1>
+    <p class="lead mb-4">Scan a QR code, track every customer, and keep deposits accurate.</p>
+    <a href="{% url 'register' %}" class="btn btn-light btn-lg text-success fw-semibold">Register your business</a>
+    <a href="{% url 'login' %}" class="btn btn-outline-light btn-lg">Login</a>
+</div>
+
+<div class="row g-3 mt-2 text-center">
+    <div class="col-md-4"><div class="card shadow-sm"><div class="card-body">
+        <div class="fs-1">📷</div><h6>Scan to track</h6>
+        <small class="text-muted">Every container has its own QR label.</small>
+    </div></div></div>
+    <div class="col-md-4"><div class="card shadow-sm"><div class="card-body">
+        <div class="fs-1">💰</div><h6>Deposits and refunds</h6>
+        <small class="text-muted">A clear history for every customer.</small>
+    </div></div></div>
+    <div class="col-md-4"><div class="card shadow-sm"><div class="card-body">
+        <div class="fs-1">🔔</div><h6>Return reminders</h6>
+        <small class="text-muted">Customers and staff are told when containers are due.</small>
+    </div></div></div>
 </div>
 {% endblock %}

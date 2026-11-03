@@ -1,15 +1,18 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#15803d">
     <title>{% block title %}ReUseTrack{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{% static 'accounts/app.css' %}" rel="stylesheet">
 </head>
-<body class="bg-light">
-    <nav class="navbar navbar-dark bg-success">
+<body class="{% if user.is_authenticated and user.business_id %}has-bottom-nav{% endif %}">
+    <nav class="navbar navbar-dark brand-nav">
         <div class="container">
-            <a class="navbar-brand" href="{% url 'home' %}">♻ ReUseTrack</a>
+            <a class="logo" href="{% url 'home' %}">♻ Reuse<span>Track</span></a>
             {% if user.is_authenticated %}
                 <div class="d-flex align-items-center gap-3">
                     {% if user.business_id %}
@@ -26,6 +29,7 @@
             {% endif %}
         </div>
     </nav>
+
     <div class="container py-4">
         {% for message in messages %}
             <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}">
@@ -35,20 +39,33 @@
         {% block content %}{% endblock %}
     </div>
 
+    {% if user.is_authenticated and user.business_id %}
+    <nav class="bottom-nav">
+        {% if user.role == 'CUSTOMER' %}
+            <a href="{% url 'portal_home' %}" class="{% if request.path == '/portal/' %}active{% endif %}"><span>📦</span>Containers</a>
+            <a href="{% url 'portal_deposits' %}" class="{% if '/portal/deposits/' in request.path %}active{% endif %}"><span>💰</span>Deposits</a>
+            <a href="{% url 'notification_list' %}" class="{% if '/notifications/' in request.path %}active{% endif %}"><span>🔔</span>Alerts</a>
+        {% else %}
+            <a href="{% url 'dashboard' %}" class="{% if request.path == '/dashboard/' %}active{% endif %}"><span>🏠</span>Home</a>
+            <a href="{% url 'customer_list' %}" class="{% if '/customers/' in request.path %}active{% endif %}"><span>👥</span>Customers</a>
+            <a href="{% url 'container_scan' %}" class="scan"><span>📷</span>Scan</a>
+            <a href="{% url 'container_list' %}" class="{% if '/containers/' in request.path and '/scan/' not in request.path %}active{% endif %}"><span>🛢️</span>Containers</a>
+            <a href="{% url 'assignment_list' %}" class="{% if '/assignments/' in request.path %}active{% endif %}"><span>🔁</span>Assign</a>
+        {% endif %}
+    </nav>
+    {% endif %}
+
     {% if user.is_authenticated %}
     <script>
     (function () {
-        var REFRESH_MS = 10000;
-        var IDLE_MS = 60000;
+        var REFRESH_MS = 5000;
+        var IDLE_MS = 20000;
         var skipPaths = ['/add/', '/report/', '/portal-login/', '/admin/'];
         var lastTouch = 0;
 
         function touch() { lastTouch = Date.now(); }
         document.addEventListener('input', touch, true);
         document.addEventListener('change', touch, true);
-        document.addEventListener('focusin', function (e) {
-            if (e.target.matches('input, select, textarea')) touch();
-        }, true);
 
         function blocked() {
             if (document.hidden) return true;
