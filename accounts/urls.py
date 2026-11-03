@@ -1,6 +1,6 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
-from . import views
+from . import pwa, views
 
 urlpatterns = [
     path('', views.home, name='home'),
@@ -11,4 +11,7 @@ urlpatterns = [
     path('staff/', views.staff_list, name='staff_list'),
     path('staff/add/', views.staff_add, name='staff_add'),
     path('staff/<int:pk>/toggle/', views.staff_toggle, name='staff_toggle'),
+    path('manifest.json', pwa.manifest, name='manifest'),
+    path('sw.js', pwa.service_worker, name='service_worker'),
+    path('offline/', pwa.offline, name='offline'),
 ]
